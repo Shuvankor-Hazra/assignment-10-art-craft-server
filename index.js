@@ -43,7 +43,7 @@ async function run() {
 
     app.get("/myCrafts/:subcategoryName", async (req, res) => {
       const id = req.params.subcategoryName;
-      const query = { subcategoryName:id };
+      const query = { subcategory_Name:id };
       const result = await craftsCollection.find(query).toArray();
       res.send(result);
     });
@@ -66,6 +66,36 @@ async function run() {
       const newCraft = req.body;
       console.log(newCraft);
       const result = await craftsCollection.insertOne(newCraft);
+      res.send(result);
+    });
+
+    app.put("/crafts/:id", async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: new ObjectId(id) };
+      const options = { upsert: true };
+      const updatedCrafts = req.body;
+      const crafts = {
+        $set: {
+
+          itemName:updatedCrafts.itemName,
+          photo:updatedCrafts.photo,
+          subcategoryName:updatedCrafts.subcategoryName,
+          shortDescription:updatedCrafts.shortDescription,
+          price:updatedCrafts.price,
+          processingTime:updatedCrafts.processingTime,
+          rating:updatedCrafts.rating,
+          customization:updatedCrafts.customization,
+          stockStatus:updatedCrafts.stockStatus
+        },
+      };
+      const result = await craftsCollection.updateOne(filter, crafts, options);
+      res.send(result);
+    });
+
+    app.delete("/crafts/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await craftsCollection.deleteOne(query);
       res.send(result);
     });
 
